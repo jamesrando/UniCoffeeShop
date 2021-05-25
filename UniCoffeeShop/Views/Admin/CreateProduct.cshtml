@@ -1,0 +1,49 @@
+﻿@model UniCoffeeShop.Models.Product
+@{
+    ViewData["Title"] = "Create Product";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<div class="text-center">
+    <h1 class="display-4" style="padding-bottom:16px">Create Product</h1>
+    <div>
+        <form class="signin-form" method="post" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <input asp-for="@Model.Id" class="form-control" placeholder="Id" />
+            </div>
+            <div class="form-group">
+                <input asp-for="@Model.Name" class="form-control" placeholder="Name" />
+            </div>
+            <div class="form-group">
+                <input asp-for="@Model.Description" class="form-control" placeholder="Description" />
+            </div>
+            <div class="form-group">
+                <input asp-for="@Model.Price" class="form-control" placeholder="Price (£)" />
+            </div>
+            <div class="form-group">
+                <label asp-for="@Model.Picture"></label>
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <div class="form-group">
+                    @if (Model.Picture != null)
+                    {
+                        <img id="productPicture" style="width: 350px; height: 350px; object-fit: cover" src="data:image/*;base64,@(Convert.ToBase64String(Model.Picture))">
+                    }
+                    else
+                    {
+                        <img id="productPicture" style="width: 350px; height: 350px; object-fit: cover" src="">
+                    }
+                    <input type="file"
+                           accept=".png,.jpg,.jpeg,.gif,.tif"
+                           asp-for="@Model.Picture"
+                           class="form-control"
+                           style="border: 0px !important; padding: 0px; padding-top: 10px; padding-bottom: 30px;"
+                           onchange="document.getElementById('productPicture').src = window.URL.createObjectURL(this.files[0])" />
+                    <span asp-validation-for="@Model.Picture" class="text-danger"></span>
+                </div>
+            </div>
+            <button id="create-product-button" type="submit" class="btn btn-success">Save</button>
+            <a id="cancel-button" type="button" class="btn btn-primary" asp-action="Index">Cancel</a>
+        </form>
+    </div>
+</div>

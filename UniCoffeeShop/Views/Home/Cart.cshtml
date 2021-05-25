@@ -1,0 +1,166 @@
+﻿@model UniCoffeeShop.Models.Cart
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+@{
+    ViewData["Title"] = "Shopping Cart";
+}
+@{
+    decimal overallPrice = 0M;
+
+    List<string> paypalCartItems = new List<string>();
+    string paypalCart = "[]";
+}
+
+<div class="text-center">
+    @if (SignInManager.IsSignedIn(User))
+     {
+        var user = await UserManager.GetUserAsync(User);
+        var name = user.FirstName;
+        <h1 class="display-4" style="padding-bottom: 16px">@name, Basket</h1>
+     }
+
+    <table class="table">
+        <thead class="thead-dark">
+            <tr>
+                <th scope="col">Picture</th>
+                <th scope="col">Name</th>
+                <th scope="col">Description</th>
+                <th scope="col">Individual Price</th>
+                <th scope="col">Quantity</th>
+                <th scope="col">Total</th>
+                <th scope="col">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model != null)
+            {
+                foreach (var item in Model.ShoppingCart)
+                {
+                    var totalPrice = item.GetTotal();
+                    overallPrice += totalPrice;
+                    var prodIdQuantity = item.Product.Id + "_quantity";
+                    <tr>
+                        <td>
+
+                            @if (item.Product.Picture != null)
+                            {
+                                <img id="productPicture" style="height: 150px; object-fit: cover; width: 150px;" src="data:image/*;base64,@(Convert.ToBase64String(item.Product.Picture))">
+                            }
+                            else
+                            {
+                                <img id="productPicture" style="height: 150px; object-fit: cover; width: 150px;" src="">
+                            }
+                        </td>
+                        <td>@item.Product.Name</td>
+                        <td>@item.Product.Description</td>
+                        <td>@item.Product.Price.ToString("C")</td>
+                        <td>
+                            <input type="number" id="@prodIdQuantity" name="quantity" min="1" max="255" value="@item.Quantity" onchange="UpdateCart('@item.Product.Id', '@Url.ActionLink("AdjustQuantityOfCartItem", "Home", new {productId = item.Product.Id})', document.getElementById('@prodIdQuantity').value)">
+                        </td>
+                        <td>@totalPrice.ToString("C")</td>
+                        <td>
+                            <a class="btn btn-danger" asp-controller="Home" asp-action="RemoveFromCart" asp-route-productId="@item.Product.Id">Remove</a>
+                        </td>
+                    </tr>
+
+                }
+                paypalCart = "[" + string.Join(",\n", paypalCartItems) + "]";
+            }
+        </tbody>
+    </table>
+    <a class="btn btn-danger" asp-controller="Home" asp-action="ClearCart">Clear Cart</a>
+    <p>Total: @overallPrice.ToString("C")</p>
+    <div style="text-align: center;">
+        <div id="paypal-button-container"></div>
+    </div>
+</div>
+<script src="https://www.paypal.com/sdk/js?client-id=AaOOjpT8JxFC14itCbzutbCDxQfqW0tPxWsff9y1mseMZzf6VqY6Of_bROleVFD6hmPVTyhXl47vz7n9&currency=GBP" data-sdk-integration-source="button-factory"></script>
+<script>
+    function UpdateCart(id, link, quantity) {
+        this.window.location = link + "&quantity=" + quantity;
+    }
+
+    function initPayPalButton() {
+        paypal.Buttons({
+            style: {
+                shape: 'rect',
+                color: 'gold',
+                layout: 'vertical',
+                label: 'paypal'
+
+            },
+
+            createOrder: function(data, actions) {
+                return actions.order.create({
+                    purchase_units: [
+                        {
+                            reference_id: "NHASTHXCJXWME",
+                            description: "Hull Uni Coffee Shop",
+                            custom_id: "UniCoffeeShop",
+                            soft_descriptor: "Coffee",
+                            amount: {
+                                currency_code: "GBP",
+                                value: "@overallPrice",
+                                breakdown: {
+                                    item_total: {
+                                        currency_code: "GBP",
+                                        value: "@overallPrice"
+                                    }
+                                }
+                            },
+                            items: [
+
+                                @foreach (var product in Model.ShoppingCart)
+                                {
+                                    @:{
+                                    @:name: "@product.Product.Name",
+                                    @:description: "@product.Product.Description",
+                                    @:SKU: "UniCoffee-@product.Product.Id",
+                                    @:unit_amount: {
+                                    @:    currency_code: "GBP",
+                                    @:    value: @product.Product.Price.ToString("##.###")
+                                    @:},
+                                    @:quantity: "@product.Quantity"
+                                    @:},
+                                }
+                            ]
+                        }
+                    ]
+                });
+            },
+
+            onApprove: function (data, actions) {
+                return actions.order.capture().then(function (details) {
+                    var invoiceNumber = InvoiceId(10);
+                    alert(`Transaction completed by ${details.payer.name.given_name + " " + "order id =" + details.id + " " + "Invoice number = " + invoiceNumber}!`);
+                    
+                });
+
+
+            },
+
+            onCancel: function(data) {
+                
+            },
+
+            onError: function(err) {
+                console.log(err);
+            }
+        }).render('#paypal-button-container');
+    }
+
+    function InvoiceId(length) {
+        var result = [];
+        var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+        var charactersLength = characters.length;
+        for (var i = 0; i < length; i++) {
+            result.push(characters.charAt(Math.floor(Math.random() *
+                charactersLength)));
+        }
+        return result.join('');
+    }
+
+    
+    initPayPalButton();
+</script>
