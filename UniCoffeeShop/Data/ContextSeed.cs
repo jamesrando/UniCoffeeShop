@@ -47,12 +47,12 @@ namespace UniCoffeeShop.Data
         {
             var products = new List<Product>
             {
-                new Product{Id="chocolate-bar",Name="Chocolate Bar",Description="A Tasty Chocolate bar",Price=0.50m},
-                new Product{Id="coca-cola",Name="Cola",Description="A Fizzy Cola",Price=1.00m},
-                new Product{Id="crisps",Name="Crisps",Description="A bag of Ready Salted Crisps",Price=0.50m},
-                new Product{Id="lemonade",Name="Lemonade",Description="A fizzy glass of lemonade",Price=1.00m},
-                new Product{Id="tea",Name="Tea",Description="A Cup of Tea",Price=1.50m},
-                new Product{Id="white-coffee",Name="White Coffee",Description="A normal coffee",Price=1.99m},
+                new Product{Id="chocolate-bar",Name="Chocolate Bar",Description="A Tasty Chocolate bar",Price=0.50m,Picture = null},
+                new Product{Id="coca-cola",Name="Cola",Description="A Fizzy Cola",Price=1.00m,Picture = null},
+                new Product{Id="crisps",Name="Crisps",Description="A bag of Ready Salted Crisps",Price=0.50m,Picture = null},
+                new Product{Id="lemonade",Name="Lemonade",Description="A fizzy glass of lemonade",Price=1.00m,Picture = null},
+                new Product{Id="tea",Name="Tea",Description="A Cup of Tea",Price=1.50m,Picture = null},
+                new Product{Id="white-coffee",Name="White Coffee",Description="A normal coffee",Price=1.99m,Picture = null},
 
             };
 
