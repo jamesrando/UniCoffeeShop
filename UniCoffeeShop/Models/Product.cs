@@ -33,14 +33,13 @@ namespace UniCoffeeShop.Models
             if (GetProduct(product.Id) == null)
             {
                
-                    using (SqlCommand cmd = new SqlCommand("INSERT INTO Data.Product(Id,Name,Description,Price,Picture) VALUES(@ProdId,@ProdName,@ProdDescription,@ProdPrice,@ProdPicture)"))
+                    using (SqlCommand cmd = new SqlCommand("INSERT INTO Data.Product(Id,Name,Description,Price) VALUES(@ProdId,@ProdName,@ProdDescription,@ProdPrice)"))
                     {
                         cmd.Parameters.AddWithValue("@ProdId", product.Id);
                         cmd.Parameters.AddWithValue("@ProdName", product.Name);
                         cmd.Parameters.AddWithValue("@ProdDescription", product.Description);
                         cmd.Parameters.AddWithValue("@ProdPrice", product.Price);
-                        if (product.Picture != null)
-                            cmd.Parameters.AddWithValue("@ProdPicture", product.Picture);
+                        
 
                         cmd.CommandType = CommandType.Text;
                         cmd.Connection = con;
